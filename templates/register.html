@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Register - MediPrice</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e8edf2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 2rem 0;
+        }
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        .card-header {
+            background-color: #4f46e5;
+            color: white;
+            border-radius: 15px 15px 0 0 !important;
+            text-align: center;
+            padding: 1.5rem;
+        }
+        .btn-primary {
+            background-color: #4f46e5;
+            border-color: #4f46e5;
+            border-radius: 50px;
+            padding: 10px 20px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .btn-primary:hover {
+            background-color: #4338ca;
+            border-color: #4338ca;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(67, 56, 202, 0.4);
+        }
+        .form-control {
+            border-radius: 50px;
+            padding: 12px 20px;
+        }
+        .form-control:focus {
+            box-shadow: 0 0 0 0.2rem rgba(79, 70, 229, 0.25);
+            border-color: #4f46e5;
+        }
+        .custom-select {
+            border-radius: 50px;
+            padding: 12px 20px;
+            height: auto;
+        }
+        .logo {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        .loading {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.9);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 5px solid #4f46e5;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .app-logo {
+            margin-bottom: 15px;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div id="loading" class="loading">
+        <div class="spinner"></div>
+        <h4 class="text-primary">Creating your account...</h4>
+        <p class="text-muted">This may take a few moments</p>
+    </div>
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-7 col-lg-6">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="app-logo">
+                            <i class="fas fa-pills logo"></i>
+                        </div>
+                        <h3 class="mb-0">Create MediPrice Account</h3>
+                    </div>
+                    <div class="card-body p-5">
+                        {% if get_flashed_messages() %}
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                {% with messages = get_flashed_messages() %}
+                                    {% if messages %}
+                                        {% for message in messages %}
+                                            <p class="mb-0">{{ message }}</p>
+                                        {% endfor %}
+                                    {% endif %}
+                                {% endwith %}
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                        {% endif %}
+                        
+                        <form method="POST" action="{{ url_for('register') }}" id="registerForm">
+                            <div class="form-group">
+                                <label for="username">Username</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text bg-light border-right-0">
+                                            <i class="fas fa-user text-primary"></i>
+                                        </span>
+                                    </div>
+                                    <input type="text" class="form-control border-left-0" id="username" name="username" placeholder="Choose a username" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="password">Password</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text bg-light border-right-0">
+                                            <i class="fas fa-lock text-primary"></i>
+                                        </span>
+                                    </div>
+                                    <input type="password" class="form-control border-left-0" id="password" name="password" placeholder="Create a password" required>
+                                </div>
+                                <small class="form-text text-muted">Password should be at least 6 characters</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="name">Full Name</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text bg-light border-right-0">
+                                            <i class="fas fa-id-card text-primary"></i>
+                                        </span>
+                                    </div>
+                                    <input type="text" class="form-control border-left-0" id="name" name="name" placeholder="Enter your full name" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="age">Age</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text bg-light border-right-0">
+                                            <i class="fas fa-calendar-alt text-primary"></i>
+                                        </span>
+                                    </div>
+                                    <input type="number" class="form-control border-left-0" id="age" name="age" placeholder="Enter your age" min="1" max="120" required>
+                                </div>
+                            </div>
+                            <div class="form-group mt-4">
+                                <button type="submit" class="btn btn-primary btn-block">
+                                    <i class="fas fa-user-plus mr-2"></i>Create Account
+                                </button>
+                            </div>
+                        </form>
+                        <div class="text-center mt-4">
+                            <p class="mb-0">Already have an account? <a href="{{ url_for('login') }}" class="text-primary font-weight-bold">Login here</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', function() {
+            document.getElementById('loading').style.display = 'flex';
+        });
+    </script>
+</body>
+</html>

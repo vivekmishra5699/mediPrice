@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medicine Routine - MediPrice</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4f46e5',
+                        secondary: '#10b981',
+                        accent: '#f43f5e',
+                        'priority-high': '#ef4444',
+                        'priority-medium': '#f59e0b',
+                        'priority-low': '#3b82f6',
+                        'light-bg': '#f8fafc',
+                        'dark-text': '#0f172a'
+                    },
+                    fontFamily: {
+                        'poppins': ['Poppins', 'sans-serif']
+                    },
+                    boxShadow: {
+                        'card': '0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02)',
+                        'pill': '0 4px 6px -1px rgba(79, 70, 229, 0.1), 0 2px 4px -1px rgba(79, 70, 229, 0.06)'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .card-animate {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card-animate:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .notification-bell {
+            transform-origin: top center;
+        }
+        
+        .btn-float {
+            box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-float:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 20px -3px rgba(79, 70, 229, 0.3);
+        }
+        
+        .table-row-hover:hover {
+            background-color: rgba(79, 70, 229, 0.04);
+        }
+        
+        .toast-animate {
+            animation: slideIn 0.3s ease forwards;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+    </style>
+</head>
+<body class="bg-light-bg min-h-screen">
+    <!-- Navigation Bar -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <div class="bg-primary/10 rounded-full p-2">
+                        <i class="fas fa-pills text-primary text-xl"></i>
+                    </div>
+                    <span class="font-bold text-xl text-dark-text ml-3">MediPrice</span>
+                </div>
+                
+                <nav class="hidden md:flex items-center space-x-8">
+                    <a href="{{ url_for('dashboard') }}" class="text-gray-600 hover:text-primary transition duration-200 font-medium">
+                        <i class="fas fa-home mr-2"></i>Dashboard
+                    </a>
+                    <a href="{{ url_for('search') }}" class="text-gray-600 hover:text-primary transition duration-200 font-medium">
+                        <i class="fas fa-search mr-2"></i>Search
+                    </a>
+                    <a href="{{ url_for('logout') }}" class="text-gray-600 hover:text-primary transition duration-200 font-medium">
+                        <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                    </a>
+                </nav>
+                
+                <!-- Mobile menu button -->
+                <div class="md:hidden">
+                    <button id="mobile-menu-button" class="text-gray-600 hover:text-primary">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile menu -->
+        <div id="mobile-menu" class="md:hidden hidden bg-white border-t border-gray-200 shadow-md">
+            <div class="px-4 py-3 space-y-3">
+                <a href="{{ url_for('dashboard') }}" class="block text-gray-600 hover:text-primary transition duration-200 font-medium">
+                    <i class="fas fa-home mr-2"></i>Dashboard
+                </a>
+                <a href="{{ url_for('search') }}" class="block text-gray-600 hover:text-primary transition duration-200 font-medium">
+                    <i class="fas fa-search mr-2"></i>Search
+                </a>
+                <a href="{{ url_for('logout') }}" class="block text-gray-600 hover:text-primary transition duration-200 font-medium">
+                    <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                </a>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <!-- Header Section -->
+        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-10">
+            <div class="mb-6 lg:mb-0">
+                <h1 class="text-3xl font-bold text-dark-text">Medicine Routine</h1>
+                <p class="text-gray-500 mt-2">Keep track of your medication schedule and never miss a dose again</p>
+            </div>
+            <a href="{{ url_for('medicine.add') }}" class="btn-float bg-primary hover:bg-primary/90 text-white font-medium py-3 px-6 rounded-full inline-flex items-center transition">
+                <i class="fas fa-plus mr-2"></i>
+                Add Medicine
+            </a>
+        </div>
+
+        <!-- Today's Reminders Section -->
+        <section class="mb-16">
+            <div class="flex items-center mb-6">
+                <div class="notification-bell bg-accent/10 rounded-full p-3 mr-3">
+                    <i class="fas fa-bell text-accent text-xl"></i>
+                </div>
+                <h2 class="text-2xl font-semibold text-dark-text">Today's Reminders</h2>
+            </div>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {% if upcoming_notifications %}
+                    {% for note in upcoming_notifications %}
+                    <div class="card-animate bg-white rounded-2xl shadow-card overflow-hidden border-t-4
+                        {% if note.priority == 'High' %}border-priority-high
+                        {% elif note.priority == 'Medium' %}border-priority-medium
+                        {% else %}border-priority-low{% endif %}">
+                        <div class="p-6">
+                            <div class="flex justify-between items-start mb-4">
+                                <h3 class="text-xl font-bold text-dark-text">{{ note.medicine_name }}</h3>
+                                <span class="px-3 py-1 rounded-full text-sm font-medium shadow-pill
+                                    {% if note.priority == 'High' %}bg-priority-high/10 text-priority-high
+                                    {% elif note.priority == 'Medium' %}bg-priority-medium/10 text-priority-medium
+                                    {% else %}bg-priority-low/10 text-priority-low{% endif %}">
+                                    {{ note.priority }}
+                                </span>
+                            </div>
+                            
+                            <div class="flex items-center text-gray-600 mb-4">
+                                <div class="bg-gray-100 rounded-full p-2 mr-3">
+                                    <i class="far fa-clock text-gray-500"></i>
+                                </div>
+                                <span class="text-base">{{ note.scheduled_time }} <span class="text-sm text-gray-400">({{ note.time_of_day }})</span></span>
+                            </div>
+                            
+                            <div class="bg-gray-50 rounded-lg p-3 mb-4">
+                                <p class="text-gray-700">
+                                    <span class="font-medium">Dosage:</span> {{ note.dosage }}
+                                </p>
+                                {% if note.instructions %}
+                                <p class="text-gray-600 text-sm mt-2 border-t border-gray-100 pt-2">
+                                    <span class="font-medium">Instructions:</span> {{ note.instructions }}
+                                </p>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="grid grid-cols-2 gap-4 mt-4">
+                                <button onclick="updateStatus({{ note.id }}, 'taken')" 
+                                        class="flex items-center justify-center bg-secondary hover:bg-secondary/90 text-white py-3 rounded-xl text-sm font-medium transition">
+                                    <i class="fas fa-check mr-2"></i> Taken
+                                </button>
+                                <button onclick="updateStatus({{ note.id }}, 'skipped')" 
+                                        class="flex items-center justify-center bg-gray-200 hover:bg-gray-300 text-gray-700 py-3 rounded-xl text-sm font-medium transition">
+                                    <i class="fas fa-times mr-2"></i> Skip
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="col-span-full bg-white rounded-2xl shadow-card p-10 text-center">
+                        <div class="inline-flex items-center justify-center h-20 w-20 rounded-full bg-blue-100 mb-6">
+                            <i class="fas fa-check-circle text-blue-600 text-3xl"></i>
+                        </div>
+                        <h3 class="text-2xl font-medium text-gray-700 mb-3">All caught up!</h3>
+                        <p class="text-gray-500 text-lg max-w-md mx-auto">You have no medication reminders scheduled for today.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </section>
+
+        <!-- Current Medications Section -->
+        <section>
+            <div class="flex items-center mb-6">
+                <div class="bg-primary/10 rounded-full p-3 mr-3">
+                    <i class="fas fa-prescription-bottle-alt text-primary text-xl"></i>
+                </div>
+                <h2 class="text-2xl font-semibold text-dark-text">Current Medications</h2>
+            </div>
+            
+            <div class="bg-white rounded-2xl shadow-card overflow-hidden">
+                {% if routines %}
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Medicine
+                                    </th>
+                                    <th scope="col" class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Priority
+                                    </th>
+                                    <th scope="col" class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
+                                        Schedule
+                                    </th>
+                                    <th scope="col" class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
+                                        Duration
+                                    </th>
+                                    <th scope="col" class="px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Actions
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                {% for routine in routines %}
+                                <tr class="table-row-hover transition-colors">
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center">
+                                            <div class="flex-shrink-0 mr-4">
+                                                <div class="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                                                    <i class="fas fa-pills text-primary"></i>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <div class="text-sm font-medium text-dark-text">
+                                                    {{ routine.medicine_name }}
+                                                </div>
+                                                <div class="text-sm text-gray-500 line-clamp-1">
+                                                    {{ routine.description }}
+                                                </div>
+                                            </div>
+                                            {% if routine.pending_notifications > 0 %}
+                                            <span class="ml-3 inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                                {{ routine.pending_notifications }}
+                                            </span>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full shadow-pill
+                                            {% if routine.priority == 'High' %}bg-priority-high/10 text-priority-high
+                                            {% elif routine.priority == 'Medium' %}bg-priority-medium/10 text-priority-medium
+                                            {% else %}bg-priority-low/10 text-priority-low{% endif %}">
+                                            {{ routine.priority }}
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden md:table-cell">
+                                        <div class="flex items-center">
+                                            <i class="far fa-calendar-alt text-gray-400 mr-2"></i>
+                                            {{ routine.dose_count }} doses/day
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden lg:table-cell">
+                                        <div class="flex items-center">
+                                            <i class="far fa-clock text-gray-400 mr-2"></i>
+                                            {{ routine.start_date }} 
+                                            {% if routine.end_date %} to {{ routine.end_date }}{% endif %}
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-center">
+                                        <div class="flex items-center justify-center space-x-3">
+                                            <a href="{{ url_for('medicine.edit', routine_id=routine.id) }}" 
+                                            class="bg-primary/10 text-primary hover:bg-primary/20 p-2 rounded-full transition">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <form method="POST" action="{{ url_for('medicine.delete', routine_id=routine.id) }}" 
+                                                class="inline">
+                                                <button type="submit" class="bg-red-50 text-red-600 hover:bg-red-100 p-2 rounded-full transition" 
+                                                        onclick="return confirm('Are you sure you want to delete this medicine routine?');">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="py-16 text-center">
+                        <div class="inline-flex items-center justify-center h-24 w-24 rounded-full bg-blue-100 mb-6">
+                            <i class="fas fa-pills text-blue-600 text-4xl"></i>
+                        </div>
+                        <h3 class="text-2xl font-medium text-gray-800 mb-4">No medications added yet</h3>
+                        <p class="text-gray-500 text-lg max-w-lg mx-auto mb-8">
+                            Start by adding your first medication to receive timely reminders and keep track of your health routine.
+                        </p>
+                        <a href="{{ url_for('medicine.add') }}" 
+                        class="inline-flex items-center px-6 py-3 border border-transparent text-lg font-medium rounded-full shadow-lg text-white bg-primary hover:bg-primary/90 transition">
+                            <i class="fas fa-plus mr-3"></i> Add Your First Medicine
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </section>
+                 <!-- Dosage Stats Section -->
+                 <section class="mt-10">
+                    <div class="bg-white rounded-2xl shadow-card p-6">
+                        <h2 class="text-2xl font-semibold text-dark-text">Today's Dosage Stats</h2>
+                        <div class="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div class="p-4 bg-gray-50 rounded-xl text-center">
+                                <p class="text-lg font-medium text-dark-text">Dosage Taken</p>
+                                <p class="mt-2 text-3xl font-bold text-secondary">{{ taken_count }}</p>
+                            </div>
+                            <div class="p-4 bg-gray-50 rounded-xl text-center">
+                                <p class="text-lg font-medium text-dark-text">Dosage Pending</p>
+                                <p class="mt-2 text-3xl font-bold text-accent">{{ remaining_count }}</p>
+                            </div>
+                            <div class="p-4 bg-yellow-50 rounded-xl text-center">
+                                <p class="text-lg font-medium text-dark-text">Dosage Skipped</p>
+                                <p class="mt-2 text-3xl font-bold text-yellow-600">{{ skipped_count }}</p>
+                            </div>
+                        </div>
+                    </div>
+                 </section>
+    </main>
+
+    <!-- Add Medicine Float Button (Mobile Only) -->
+    <a href="{{ url_for('medicine.add') }}" 
+       class="md:hidden fixed bottom-8 right-8 bg-primary hover:bg-primary/90 text-white w-16 h-16 rounded-full flex items-center justify-center shadow-lg btn-float">
+        <i class="fas fa-plus text-xl"></i>
+    </a>
+
+    <!-- Toast container for notifications -->
+    <div id="toast-container" class="fixed bottom-6 right-6 z-50"></div>
+    
+    <!-- JavaScript for handling notifications -->
+    <script>
+        // Mobile menu toggle
+        document.getElementById('mobile-menu-button').addEventListener('click', function() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        function updateStatus(notificationId, status) {
+            fetch(`{{ url_for('medicine.update_notification', notification_id=0) }}`.replace('0', notificationId), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ status: status })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast(`Medicine marked as ${status}`, 'success');
+                    setTimeout(() => {
+                        location.reload();
+                    }, 2000);
+                } else {
+                    showToast('Failed to update status', 'error');
+                }
+            })
+            .catch(error => {
+                showToast('Error updating status', 'error');
+                console.error('Error:', error);
+            });
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast-animate p-4 mb-4 rounded-xl shadow-lg text-white flex items-center ${
+                type === 'success' ? 'bg-secondary' : 'bg-red-500'
+            }`;
+            
+            const icon = document.createElement('i');
+            icon.className = `fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} mr-3`;
+            
+            const textSpan = document.createElement('span');
+            textSpan.className = 'font-medium';
+            textSpan.textContent = message;
+            
+            toast.appendChild(icon);
+            toast.appendChild(textSpan);
+            
+            const container = document.getElementById('toast-container');
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100px)';
+                toast.style.transition = 'all 0.3s ease';
+                
+                setTimeout(() => {
+                    toast.remove();
+                }, 300);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

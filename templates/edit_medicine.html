@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Medicine - MediPrice</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4f46e5',
+                        secondary: '#10b981',
+                        accent: '#f43f5e',
+                        'priority-high': '#ef4444',
+                        'priority-medium': '#f59e0b',
+                        'priority-low': '#3b82f6',
+                        'light-bg': '#f8fafc',
+                        'dark-text': '#0f172a'
+                    },
+                    fontFamily: {
+                        'poppins': ['Poppins', 'sans-serif']
+                    },
+                    boxShadow: {
+                        'card': '0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02)',
+                        'pill': '0 4px 6px -1px rgba(79, 70, 229, 0.1), 0 2px 4px -1px rgba(79, 70, 229, 0.06)'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .form-section {
+            transition: all 0.3s ease;
+            border-radius: 1rem;
+        }
+        
+        .form-section:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-float {
+            box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-float:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 20px -3px rgba(79, 70, 229, 0.3);
+        }
+        
+        .dose-item {
+            transition: all 0.3s ease;
+        }
+        
+        .dose-item:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+            border-color: #4f46e5;
+        }
+        
+        input, select, textarea {
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            padding: 0.5rem 0.75rem;
+        }
+        
+        .section-icon {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .toast-animate {
+            animation: slideIn 0.3s ease forwards;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+    </style>
+</head>
+<body class="bg-light-bg min-h-screen">
+    <!-- Navigation Bar -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <div class="bg-primary/10 rounded-full p-2">
+                        <i class="fas fa-pills text-primary text-xl"></i>
+                    </div>
+                    <span class="font-bold text-xl text-dark-text ml-3">MediPrice</span>
+                </div>
+                
+                <nav class="hidden md:flex items-center space-x-8">
+                    <a href="{{ url_for('dashboard') }}" class="text-gray-600 hover:text-primary transition duration-200 font-medium">
+                        <i class="fas fa-home mr-2"></i>Dashboard
+                    </a>
+                    <a href="{{ url_for('medicine.index') }}" class="text-gray-600 hover:text-primary transition duration-200 font-medium">
+                        <i class="fas fa-prescription-bottle-alt mr-2"></i>Medicine Routine
+                    </a>
+                    <a href="{{ url_for('logout') }}" class="text-gray-600 hover:text-primary transition duration-200 font-medium">
+                        <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                    </a>
+                </nav>
+                
+                <!-- Mobile menu button -->
+                <div class="md:hidden">
+                    <button id="mobile-menu-button" class="text-gray-600 hover:text-primary">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile menu -->
+        <div id="mobile-menu" class="md:hidden hidden bg-white border-t border-gray-200 shadow-md">
+            <div class="px-4 py-3 space-y-3">
+                <a href="{{ url_for('dashboard') }}" class="block text-gray-600 hover:text-primary transition duration-200 font-medium">
+                    <i class="fas fa-home mr-2"></i>Dashboard
+                </a>
+                <a href="{{ url_for('medicine.index') }}" class="block text-gray-600 hover:text-primary transition duration-200 font-medium">
+                    <i class="fas fa-prescription-bottle-alt mr-2"></i>Medicine Routine
+                </a>
+                <a href="{{ url_for('logout') }}" class="block text-gray-600 hover:text-primary transition duration-200 font-medium">
+                    <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                </a>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <!-- Header Section -->
+        <div class="mb-8">
+            <div class="flex items-center mb-2">
+                <div class="bg-primary/10 rounded-full p-3 mr-3">
+                    <i class="fas fa-edit text-primary text-xl section-icon"></i>
+                </div>
+                <h1 class="text-3xl font-bold text-dark-text">Edit Medicine</h1>
+            </div>
+            <p class="text-gray-500 ml-16">Update your medicine routine and reminders</p>
+        </div>
+        
+        <!-- Form Container -->
+        <div class="max-w-4xl mx-auto">
+            <form method="POST" id="medicineForm" class="bg-white rounded-2xl shadow-card p-8">
+                <!-- Basic Information Section -->
+                <div class="form-section mb-10 pb-8 border-b border-gray-100 bg-white p-6 rounded-xl">
+                    <div class="flex items-center mb-6">
+                        <div class="bg-primary/10 h-10 w-10 rounded-full flex items-center justify-center mr-3">
+                            <i class="fas fa-info-circle text-primary"></i>
+                        </div>
+                        <h2 class="text-xl font-bold text-dark-text">Basic Information</h2>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="col-span-1">
+                            <label for="medicine_name" class="block text-sm font-medium text-gray-700 mb-2">Medicine Name <span class="text-red-500">*</span></label>
+                            <input type="text" id="medicine_name" name="medicine_name" value="{{ routine.medicine_name }}" required 
+                                class="w-full transition-all duration-200 focus:outline-none">
+                        </div>
+                        
+                        <div class="col-span-1">
+                            <label for="priority" class="block text-sm font-medium text-gray-700 mb-2">Priority <span class="text-red-500">*</span></label>
+                            <select id="priority" name="priority" required 
+                                class="w-full transition-all duration-200 focus:outline-none">
+                                <option value="High" {% if routine.priority == 'High' %}selected{% endif %}>High</option>
+                                <option value="Medium" {% if routine.priority == 'Medium' %}selected{% endif %}>Medium</option>
+                                <option value="Low" {% if routine.priority == 'Low' %}selected{% endif %}>Low</option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-span-full">
+                            <label for="description" class="block text-sm font-medium text-gray-700 mb-2">Description (Optional)</label>
+                            <textarea id="description" name="description" rows="3" 
+                                class="w-full transition-all duration-200 focus:outline-none">{{ routine.description }}</textarea>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Schedule Section -->
+                <div class="form-section mb-10 pb-8 border-b border-gray-100 bg-white p-6 rounded-xl">
+                    <div class="flex items-center mb-6">
+                        <div class="bg-primary/10 h-10 w-10 rounded-full flex items-center justify-center mr-3">
+                            <i class="fas fa-calendar-alt text-primary"></i>
+                        </div>
+                        <h2 class="text-xl font-bold text-dark-text">Schedule</h2>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="col-span-1">
+                            <label for="start_date" class="block text-sm font-medium text-gray-700 mb-2">Start Date <span class="text-red-500">*</span></label>
+                            <div class="relative">
+                                <input type="date" id="start_date" name="start_date" value="{{ routine.start_date }}" required 
+                                    class="w-full transition-all duration-200 focus:outline-none">
+                            </div>
+                        </div>
+                        
+                        <div class="col-span-1">
+                            <label for="end_date" class="block text-sm font-medium text-gray-700 mb-2">End Date (Optional)</label>
+                            <div class="relative">
+                                <input type="date" id="end_date" name="end_date" value="{{ routine.end_date }}" 
+                                    class="w-full transition-all duration-200 focus:outline-none">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Doses Section -->
+                <div class="form-section mb-10 bg-white p-6 rounded-xl">
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="flex items-center">
+                            <div class="bg-primary/10 h-10 w-10 rounded-full flex items-center justify-center mr-3">
+                                <i class="fas fa-prescription text-primary"></i>
+                            </div>
+                            <h2 class="text-xl font-bold text-dark-text">Doses</h2>
+                        </div>
+                        
+                        <button type="button" id="addDoseBtn" class="bg-secondary hover:bg-secondary/90 text-white px-4 py-2 rounded-full text-sm font-medium transition-all flex items-center">
+                            <i class="fas fa-plus mr-2"></i> Add Dose
+                        </button>
+                    </div>
+                    
+                    <div id="dosesContainer">
+                        {% for dose in doses %}
+                        <div class="dose-item bg-gray-50 p-6 rounded-xl mb-4 border border-gray-100">
+                            <div class="flex justify-between items-start mb-4">
+                                <span class="bg-primary/10 px-3 py-1 rounded-full text-xs font-medium text-primary">Dose #{{ loop.index }}</span>
+                                <button type="button" class="remove-dose text-red-500 hover:text-red-700 transition-colors">
+                                    <i class="fas fa-times-circle"></i>
+                                </button>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+                                <div class="col-span-1">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Time of Day <span class="text-red-500">*</span></label>
+                                    <input type="time" name="dose_time" value="{{ dose.time_of_day }}" required 
+                                        class="w-full transition-all duration-200 focus:outline-none">
+                                </div>
+                                
+                                <div class="col-span-1">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Frequency (hours) <span class="text-red-500">*</span></label>
+                                    <input type="number" name="frequency_hours" value="{{ dose.frequency_hours }}" min="1" max="24" required 
+                                        class="w-full transition-all duration-200 focus:outline-none">
+                                </div>
+                                
+                                <div class="col-span-1">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Dosage <span class="text-red-500">*</span></label>
+                                    <input type="text" name="dosage" value="{{ dose.dosage }}" placeholder="e.g. 1 tablet" required 
+                                        class="w-full transition-all duration-200 focus:outline-none">
+                                </div>
+                                
+                                <div class="col-span-1">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Instructions</label>
+                                    <textarea name="instructions" rows="1" placeholder="e.g. Take with food" 
+                                        class="w-full transition-all duration-200 focus:outline-none">{{ dose.instructions }}</textarea>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <!-- Hidden input for doses JSON -->
+                    <input type="hidden" id="doses" name="doses">
+                </div>
+                
+                <!-- Form Actions -->
+                <div class="flex justify-between items-center">
+                    <a href="{{ url_for('medicine.index') }}" class="px-6 py-3 bg-gray-200 hover:bg-gray-300 rounded-xl text-gray-700 font-medium transition-colors flex items-center">
+                        <i class="fas fa-arrow-left mr-2"></i> Back to Medicines
+                    </a>
+                    
+                    <button type="submit" class="btn-float px-8 py-3 bg-primary hover:bg-primary/90 text-white font-medium rounded-xl transition-all flex items-center">
+                        <i class="fas fa-save mr-2"></i> Update Medicine
+                    </button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <!-- Toast container for notifications -->
+    <div id="toast-container" class="fixed bottom-6 right-6 z-50"></div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mobile menu toggle
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            if (mobileMenuButton) {
+                mobileMenuButton.addEventListener('click', function() {
+                    const mobileMenu = document.getElementById('mobile-menu');
+                    mobileMenu.classList.toggle('hidden');
+                });
+            }
+            
+            // Update dose numbers
+            function updateDoseNumbers() {
+                const doseItems = document.querySelectorAll('.dose-item');
+                doseItems.forEach((item, index) => {
+                    const doseNumber = index + 1;
+                    const doseLabel = item.querySelector('span');
+                    doseLabel.textContent = `Dose #${doseNumber}`;
+                });
+            }
+            
+            // Add Dose Button
+            document.getElementById('addDoseBtn').addEventListener('click', function() {
+                addDoseItem();
+                updateDoseNumbers();
+                showToast('New dose added', 'success');
+            });
+            
+            // Initial Remove Dose buttons
+            document.querySelectorAll('.remove-dose').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    if (document.querySelectorAll('.dose-item').length > 1) {
+                        this.closest('.dose-item').remove();
+                        updateDoseNumbers();
+                        showToast('Dose removed', 'info');
+                    } else {
+                        showToast('At least one dose is required', 'error');
+                    }
+                });
+            });
+            
+            // Form Submission
+            document.getElementById('medicineForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Collect all doses into JSON
+                const doses = [];
+                document.querySelectorAll('.dose-item').forEach(item => {
+                    const timeOfDay = item.querySelector('input[name="dose_time"]').value;
+                    const frequencyHours = item.querySelector('input[name="frequency_hours"]').value;
+                    const dosage = item.querySelector('input[name="dosage"]').value;
+                    const instructions = item.querySelector('textarea[name="instructions"]').value;
+                    
+                    doses.push({
+                        time_of_day: timeOfDay,
+                        frequency_hours: frequencyHours,
+                        dosage: dosage,
+                        instructions: instructions
+                    });
+                });
+                
+                document.getElementById('doses').value = JSON.stringify(doses);
+                showToast('Updating medicine...', 'info');
+                setTimeout(() => this.submit(), 800);
+            });
+        });
+        
+        function addDoseItem() {
+            const doseCount = document.querySelectorAll('.dose-item').length + 1;
+            
+            const template = `
+            <div class="dose-item bg-gray-50 p-6 rounded-xl mb-4 border border-gray-100">
+                <div class="flex justify-between items-start mb-4">
+                    <span class="bg-primary/10 px-3 py-1 rounded-full text-xs font-medium text-primary">Dose #${doseCount}</span>
+                    <button type="button" class="remove-dose text-red-500 hover:text-red-700 transition-colors">
+                        <i class="fas fa-times-circle"></i>
+                    </button>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+                    <div class="col-span-1">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Time of Day <span class="text-red-500">*</span></label>
+                        <input type="time" name="dose_time" required 
+                            class="w-full transition-all duration-200 focus:outline-none">
+                    </div>
+                    
+                    <div class="col-span-1">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Frequency (hours) <span class="text-red-500">*</span></label>
+                        <input type="number" name="frequency_hours" min="1" max="24" required 
+                            class="w-full transition-all duration-200 focus:outline-none">
+                    </div>
+                    
+                    <div class="col-span-1">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Dosage <span class="text-red-500">*</span></label>
+                        <input type="text" name="dosage" placeholder="e.g. 1 tablet" required 
+                            class="w-full transition-all duration-200 focus:outline-none">
+                    </div>
+                    
+                    <div class="col-span-1">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Instructions</label>
+                        <textarea name="instructions" rows="1" placeholder="e.g. Take with food" 
+                            class="w-full transition-all duration-200 focus:outline-none"></textarea>
+                    </div>
+                </div>
+            </div>`;
+            
+            const container = document.getElementById('dosesContainer');
+            const newDose = document.createElement('div');
+            newDose.innerHTML = template;
+            container.appendChild(newDose.firstElementChild);
+            
+            // Add event listener to new remove button
+            newDose.querySelector('.remove-dose').addEventListener('click', function() {
+                if (document.querySelectorAll('.dose-item').length > 1) {
+                    this.closest('.dose-item').remove();
+                    updateDoseNumbers();
+                    showToast('Dose removed', 'info');
+                } else {
+                    showToast('At least one dose is required', 'error');
+                }
+            });
+        }
+        
+        function updateDoseNumbers() {
+            const doseItems = document.querySelectorAll('.dose-item');
+            doseItems.forEach((item, index) => {
+                const doseNumber = index + 1;
+                const doseLabel = item.querySelector('span');
+                doseLabel.textContent = `Dose #${doseNumber}`;
+            });
+        }
+        
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast-animate p-4 mb-4 rounded-xl shadow-lg text-white flex items-center ${
+                type === 'success' ? 'bg-secondary' : 
+                type === 'error' ? 'bg-red-500' : 'bg-blue-500'
+            }`;
+            
+            const icon = document.createElement('i');
+            icon.className = `fas ${
+                type === 'success' ? 'fa-check-circle' : 
+                type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'
+            } mr-3`;
+            
+            const textSpan = document.createElement('span');
+            textSpan.className = 'font-medium';
+            textSpan.textContent = message;
+            
+            toast.appendChild(icon);
+            toast.appendChild(textSpan);
+            
+            const container = document.getElementById('toast-container');
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100px)';
+                toast.style.transition = 'all 0.3s ease';
+                
+                setTimeout(() => {
+                    toast.remove();
+                }, 300);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

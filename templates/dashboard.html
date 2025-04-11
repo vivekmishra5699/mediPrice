@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediPrice Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4361ee',
+                        secondary: '#3bc4a2',
+                        accent: '#f72585',
+                        dark: '#131b23',
+                        light: '#f8f9fa'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'soft': '0 10px 25px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025)',
+                        'glow': '0 0 20px rgba(67, 97, 238, 0.3)',
+                        'card': '0 4px 6px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.1)',
+                        'deep': '0 10px 40px -10px rgba(0, 0, 0, 0.2)',
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'float': 'float 5s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        }
+                    },
+                    backgroundImage: {
+                        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .scroll-hidden::-webkit-scrollbar {
+            display: none;
+        }
+
+        .glassmorphism {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .search-glow:focus {
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.3);
+        }
+
+        .medicine-card {
+            transition: all 0.3s ease;
+            transform-origin: center;
+        }
+
+        .medicine-card:hover {
+            transform: translateY(-5px) scale(1.01);
+        }
+
+        .gradient-bg {
+            background: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
+        }
+
+        .sidebar-link {
+            transition: all 0.2s ease-in-out;
+        }
+
+        .sidebar-link:hover {
+            transform: translateX(5px);
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 min-h-screen font-sans text-dark overflow-x-hidden">
+    <!-- App Layout Wrapper -->
+    <div class="flex flex-col h-screen">
+
+        <!-- Main Content -->
+        <main class="flex-1 flex flex-col overflow-y-auto">
+            <!-- Header -->
+            <header class="bg-white border-b border-gray-200 py-4 px-4 md:px-6">
+                <div class="container mx-auto flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <a href="{{ url_for('dashboard') }}" class="flex items-center space-x-3">
+                            <div class="bg-primary/10 p-2 rounded-lg">
+                                <i class="fas fa-pills text-primary text-xl"></i>
+                            </div>
+                            <span class="font-bold text-xl">MediPrice</span>
+                        </a>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <span class="text-gray-700 font-medium">{{ user.name }}</span>
+                        <a href="{{ url_for('logout') }}" class="text-primary hover:text-primary/80">
+                            <i class="fas fa-sign-out-alt mr-1"></i> Logout
+                        </a>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Content -->
+            <div class="flex-1 overflow-y-auto px-4 py-6 md:px-6 md:py-8">
+                <div class="container mx-auto">
+                    <!-- Welcome Section -->
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
+                        <div>
+                            <h1 class="text-2xl md:text-3xl font-bold">Welcome back, {{ user.name }}!</h1>
+                            <p class="text-gray-600 mt-1">Let's find the best medicine prices for you today</p>
+                        </div>
+                        <div class="mt-4 md:mt-0">
+                            <div class="bg-white rounded-lg shadow-card px-4 py-2 flex items-center space-x-2">
+                                <i class="far fa-calendar-alt text-primary"></i>
+                                <span class="text-gray-700" id="currentDate"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Search Hero Section -->
+                    <div class="gradient-bg rounded-3xl shadow-deep p-8 mb-10 relative overflow-hidden">
+                        <div class="relative z-10">
+                            <div class="flex items-center mb-4">
+                                <div class="p-2 bg-white/20 rounded-lg mr-3">
+                                    <i class="fas fa-search text-white"></i>
+                                </div>
+                                <h3 class="text-xl md:text-2xl font-bold text-white">Find the Best Medicine Prices</h3>
+                            </div>
+
+                            <form method="POST" action="{{ url_for('search') }}" class="relative max-w-4xl mx-auto">
+                                <div class="relative">
+                                    <input type="text" name="query"
+                                        placeholder="Enter medicine name (e.g., Crocin, Paracetamol, etc.)"
+                                        class="w-full py-4 px-6 pr-16 rounded-xl shadow-lg border-0 search-glow outline-none text-gray-800 placeholder-gray-400 text-lg"
+                                        required autocomplete="off">
+                                    <button type="submit"
+                                        class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-accent hover:bg-accent/90 text-white rounded-lg px-5 py-2.5 flex items-center transition-all hover:shadow-glow">
+                                        <i class="fas fa-search mr-2"></i>
+                                        Search
+                                    </button>
+                                </div>
+
+                                <div class="mt-5 flex flex-wrap gap-3">
+                                    <span class="text-white/80">Popular:</span>
+                                    <div class="flex flex-wrap gap-2">
+                                        <a href="{{ url_for('search') }}?query=paracetamol"
+                                            class="bg-white/20 hover:bg-white/30 text-white px-3 py-1 rounded-full transition-all">Paracetamol</a>
+                                        <a href="{{ url_for('search') }}?query=crocin"
+                                            class="bg-white/20 hover:bg-white/30 text-white px-3 py-1 rounded-full transition-all">Crocin</a>
+                                        <a href="{{ url_for('search') }}?query=azithromycin"
+                                            class="bg-white/20 hover:bg-white/30 text-white px-3 py-1 rounded-full transition-all">Azithromycin</a>
+                                        <a href="{{ url_for('search') }}?query=cetrizine"
+                                            class="bg-white/20 hover:bg-white/30 text-white px-3 py-1 rounded-full transition-all">Cetrizine</a>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Medicine Tracker and Recent Searches -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+                        <!-- ... existing code ... -->
+
+                        <!-- Medicine Tracker Card - Simplified with View option -->
+                        <div class="bg-white rounded-2xl shadow-card overflow-hidden">
+                            <div class="bg-gradient-to-r from-secondary/90 to-secondary p-6">
+                                <h3 class="text-lg font-bold text-white">Your Medicine Schedule</h3>
+                                <p class="text-white/80 mt-2">Never miss a dose with your personalized medicine schedule
+                                </p>
+                            </div>
+
+                            <div class="p-6">
+                                <a href="{{ url_for('medicine.index') }}"
+                                    class="w-full py-3.5 bg-secondary hover:bg-secondary/90 text-white font-medium rounded-lg transition-colors flex items-center justify-center shadow-sm hover:shadow-md">
+                                    <i class="fas fa-calendar-alt mr-2"></i> View Medicine Routine
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Recent Searches -->
+                        <div class="bg-white rounded-2xl shadow-card overflow-hidden">
+                            <div class="flex justify-between items-center p-6 border-b">
+                                <h3 class="text-lg font-bold text-gray-800">Recent Searches</h3>
+                                {% if recent_searches %}
+                                <a href="{{ url_for('clear_search_history') }}"
+                                    class="text-primary hover:text-primary/80 text-sm font-medium flex items-center">
+                                    <i class="fas fa-trash-alt mr-1"></i> Clear
+                                </a>
+                                {% endif %}
+                            </div>
+
+                            <div class="p-6">
+                                {% if recent_searches %}
+                                <div class="space-y-4">
+                                    {% for search in recent_searches %}
+                                    <div class="border-b pb-3 last:border-0 last:pb-0">
+                                        <a href="{{ url_for('search') }}?query={{ search.query }}"
+                                            class="medicine-card block hover:bg-gray-50 p-3 rounded-lg transition-colors">
+                                            <div class="grid grid-cols-12 gap-2 items-center">
+                                                <div class="col-span-1">
+                                                    <div
+                                                        class="h-10 w-10 bg-primary/10 rounded-full flex items-center justify-center">
+                                                        <i class="fas fa-search text-primary"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="col-span-9">
+                                                    <div class="flex flex-wrap items-center space-x-2">
+                                                        <span class="font-medium text-gray-800">{{ search.query
+                                                            }}</span>
+                                                        {% if search.results_count %}
+                                                        <span
+                                                            class="bg-green-100 text-green-700 text-xs px-2 py-0.5 rounded-full">{{
+                                                            search.results_count }} results</span>
+                                                        {% endif %}
+                                                    </div>
+                                                    <p class="text-sm text-gray-500 mt-1">
+                                                        {{ search.search_date }}
+                                                    </p>
+                                                </div>
+                                                <div class="col-span-2 text-right">
+                                                    <i class="fas fa-chevron-right text-gray-400"></i>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                {% else %}
+                                <div class="bg-gray-50 rounded-lg p-8 text-center">
+                                    <div
+                                        class="h-16 w-16 bg-gray-100 rounded-full mx-auto mb-4 flex items-center justify-center">
+                                        <i class="fas fa-search text-gray-400 text-xl"></i>
+                                    </div>
+                                    <p class="text-gray-500">Your recent searches will appear here</p>
+                                    <p class="text-gray-400 text-sm mt-1">Start searching for medicines to see your
+                                        history</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Back to Top Button -->
+    <button id="backToTop"
+        class="fixed bottom-8 right-8 bg-primary text-white h-12 w-12 rounded-full shadow-lg flex items-center justify-center opacity-0 invisible transition-all duration-300 hover:bg-primary/90 z-20">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <script>
+        // Current date
+        document.getElementById('currentDate').textContent = new Date().toLocaleDateString('en-US', {
+            month: 'long',
+            day: 'numeric',
+            year: 'numeric'
+        });
+
+        // Back to top button
+        const backToTopButton = document.getElementById('backToTop');
+
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                backToTopButton.classList.remove('opacity-0', 'invisible');
+                backToTopButton.classList.add('opacity-100', 'visible');
+            } else {
+                backToTopButton.classList.remove('opacity-100', 'visible');
+                backToTopButton.classList.add('opacity-0', 'invisible');
+            }
+        });
+
+        backToTopButton.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+    </script>
+</body>
+
+</html>

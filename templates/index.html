@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediPrice - Find Best Medicine Prices</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4f46e5',
+                        secondary: '#10b981',
+                        accent: '#f43f5e',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="min-h-screen flex flex-col">
+        <!-- Hero Section -->
+        <div class="flex-grow flex items-center">
+            <div class="container mx-auto px-4 py-10">
+                <div class="flex flex-col lg:flex-row items-center">
+                    <div class="lg:w-1/2 mb-10 lg:mb-0">
+                        <h1 class="text-4xl lg:text-5xl font-bold text-gray-800 mb-6">Welcome to MediPrice</h1>
+                        <p class="text-xl text-gray-600 mb-8">Find and compare medicine prices across multiple online pharmacies to get the best deals.</p>
+                        <div class="flex flex-col sm:flex-row gap-4">
+                            <a href="{{ url_for('login') }}" class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-primary hover:bg-primary/90 transition-colors">
+                                <i class="fas fa-sign-in-alt mr-2"></i> Login
+                            </a>
+                            <a href="{{ url_for('register') }}" class="inline-flex items-center justify-center px-6 py-3 border border-gray-300 text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+                                <i class="fas fa-user-plus mr-2"></i> Register
+                            </a>
+                        </div>
+                    </div>
+                    <div class="lg:w-1/2 flex justify-center">
+                        <!-- Hero Image -->
+                        <div class="relative">
+                            <div class="absolute -top-6 -left-6 w-24 h-24 rounded-full bg-primary/20 z-0"></div>
+                            <div class="absolute -bottom-4 -right-4 w-32 h-32 rounded-full bg-accent/20 z-0"></div>
+                            <div class="relative z-10 bg-white rounded-xl shadow-xl p-4 max-w-md">
+                                <img src="https://images.unsplash.com/photo-1607619056574-7b8d3ee536b2?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&h=600&q=80" alt="Medicine" class="w-full h-auto rounded-lg">
+                                <div class="absolute -bottom-4 -right-4 bg-white rounded-lg shadow-lg px-4 py-2">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-tags text-accent mr-2"></i>
+                                        <span class="font-semibold text-gray-800">Compare prices instantly</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Features Banner -->
+        <div class="bg-primary py-8 text-white">
+            <div class="container mx-auto px-4">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="flex items-center">
+                        <div class="rounded-full bg-white/10 p-3 mr-4">
+                            <i class="fas fa-search text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold mb-1">Multi-Source Search</h3>
+                            <p class="text-sm text-white/80">Find medicines from multiple online pharmacies</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center">
+                        <div class="rounded-full bg-white/10 p-3 mr-4">
+                            <i class="fas fa-tags text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold mb-1">Price Comparison</h3>
+                            <p class="text-sm text-white/80">Find the best price for your medicines</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center">
+                        <div class="rounded-full bg-white/10 p-3 mr-4">
+                            <i class="fas fa-bolt text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold mb-1">Real-time Results</h3>
+                            <p class="text-sm text-white/80">Get up-to-date information instantly</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <footer class="bg-white py-6 border-t">
+            <div class="container mx-auto px-4">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <div class="flex items-center mb-4 md:mb-0">
+                        <i class="fas fa-pills text-primary text-xl mr-2"></i>
+                        <span class="font-semibold text-gray-800">MediPrice</span>
+                    </div>
+                    <div class="text-sm text-gray-600">
+                        &copy; 2025 MediPrice. Find the best medicine prices across online pharmacies.
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>
