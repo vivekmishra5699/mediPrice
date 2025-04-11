@@ -5,9 +5,8 @@ __pycache__/
 *.pyd
 
 # Logs and databases
-*.log
-*.sqlite3
-*.db
+
+
 
 # Environment variables
 .env
